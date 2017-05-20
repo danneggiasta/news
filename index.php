@@ -7,10 +7,6 @@ error_reporting(E_ALL);
 //include "functions/check.php";
 include('includes/pages.inc.php');
 
-
-
-
-
 session_set_cookie_params(0);
 session_start();
 
@@ -30,7 +26,7 @@ session_write_close();
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title><?php // echo $page['header'].' | '.$site_title; ?></title>
+    <title><?php if(isset($page->output['header'])){ echo $page->output['header'].' | '.$site_title; } ?></title>
     <meta name="description" content="The Danneggisata Craft">
     <meta name="DanneggiastaCraft" content="News">
 
@@ -60,11 +56,11 @@ session_write_close();
 
             <ul>
 
-                <li<?php if($pageid == 1) { echo ' class="active"'; } ?>><a href="?page=1">Home</a></li>
-                <li<?php if($pageid == 2) { echo ' class="active"'; } ?>><a href="?page=2"><a href="#">Tech</a></li>
-                <li><a href="#">Sport</a></li>
-                <li><a href="#">Weather</a></li>
-                <li><a href="#">About</a></li>
+                <li<?php if(isset($page->pageid) && $page->pageid == 1) { echo ' class="current"'; } ?>><a href="?page=1">Home</a></li>
+                <li<?php if(isset($page->pageid) && $page->pageid == 2) { echo ' class="current"'; } ?>><a href="?page=2">Tech</a></li>
+                <li<?php if(isset($page->pageid) && $page->pageid == 3) { echo ' class="current"'; } ?>><a href="?page=3">Sport</a></li>
+                <li<?php if(isset($page->pageid) && $page->pageid == 4) { echo ' class="current"'; } ?>><a href="?page=4">Weather</a></li>
+                <li<?php if(isset($page->pageid) && $page->pageid == 5) { echo ' class="current"'; } ?>><a href="?page=5">About</a></li>
 
             </ul>
 

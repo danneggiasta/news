@@ -13,7 +13,7 @@ class Pages extends Dbh
 
         $dbc = parent::connect();
 
-        $r = $dbc->prepare("SELECT * FROM pages WHERE id = $?");
+        $r = $dbc->prepare("SELECT * FROM pages WHERE id = ?");
         $r->bind_param('s', $pageid);
         $r->execute();
         $r->bind_result($pageid);
@@ -25,7 +25,6 @@ class Pages extends Dbh
 
         if ($count == 1) {
 
-            session_start();
             if (isset($_GET['page'])) {
 
                 $pageid = $_GET['page'];
@@ -37,9 +36,8 @@ class Pages extends Dbh
 
         } else {
 
-            header('Location: ../index.php');
+            header('Location: ../index.php'); exit;
 
-            session_write_close();
 
         }
 

@@ -8,11 +8,14 @@ $site_title = 'DanneggiastaCraft';
 class Pages extends Dbh
 {
 
+    public $output = [];
+    public $pageid;
+
     public function connectPage($pageid)
     {
+        $this->pageid = $pageid;
 
         $dbc = parent::connect();
-
 
         if (isset($_GET['page'])) {
 
@@ -24,21 +27,21 @@ class Pages extends Dbh
         }
 
 
+
         $page = $dbc->prepare("SELECT * FROM pages WHERE id = ?");
         $page->bind_param('i', $pageid);
         $page->execute();
 
         $result = $page->get_result();
 
-        while($row = $result->fetch_array()) {
+
+        while ($row = $result->fetch_array()) {
 
             $output['label'] = $row['label'];
             $output['title'] = $row['title'];
             $output['header'] = $row['header'];
             $output['body'] = $row['body'];
-
-            var_dump($output);
-
+            $this->output = $output;
         }
 
 

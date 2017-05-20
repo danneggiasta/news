@@ -12,7 +12,7 @@ class Dbh {
 
         $this->servername = "localhost";
         $this->username = "danneggiasta";
-        $this->password = "";
+        $this->password = "QAZxc321!@#";
         $this->dbname = "news";
 
         $conn = new mysqli($this->servername, $this->username, $this->password, $this->dbname);
@@ -21,7 +21,7 @@ class Dbh {
         if ($conn->connect_error) {
             die("Connection failed: " . $conn->connect_error);
         } else {
-            echo "Connected successfully";
+          //  echo "Connected successfully";
             return $conn;
         }
 

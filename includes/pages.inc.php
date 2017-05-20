@@ -27,10 +27,19 @@ class Pages extends Dbh
         $page = $dbc->prepare("SELECT * FROM pages WHERE id = ?");
         $page->bind_param('i', $pageid);
         $page->execute();
-        $page->bind_result($pageid);
-        $page->store_result();
 
-        var_dump($page);
+        $result = $page->get_result();
+
+        while($row = $result->fetch_array()) {
+
+            $output['label'] = $row['label'];
+            $output['title'] = $row['title'];
+            $output['header'] = $row['header'];
+            $output['body'] = $row['body'];
+
+            var_dump($output);
+
+        }
 
 
     }

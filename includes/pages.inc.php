@@ -13,33 +13,25 @@ class Pages extends Dbh
 
         $dbc = parent::connect();
 
-        $r = $dbc->prepare("SELECT * FROM pages WHERE id = ?");
-        $r->bind_param('s', $pageid);
-        $r->execute();
-        $r->bind_result($pageid);
-        $r->store_result();
 
-        $page = $r->fetch();
+        if (isset($_GET['page'])) {
 
-        $count = $r->num_rows;
-
-        if ($count == 1) {
-
-            if (isset($_GET['page'])) {
-
-                $pageid = $_GET['page'];
-
-            } else {
-
-                $pageid = 1;
-            }
+            $pageid = $_GET['page'];
 
         } else {
 
-            header('Location: ../index.php'); exit;
-
-
+            $pageid = 1;
         }
+
+
+        $page = $dbc->prepare("SELECT * FROM pages WHERE id = ?");
+        $page->bind_param('i', $pageid);
+        $page->execute();
+        $page->bind_result($pageid);
+        $page->store_result();
+
+        var_dump($page);
+
 
     }
 

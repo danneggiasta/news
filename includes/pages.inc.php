@@ -5,25 +5,43 @@ $page_title = 'Home Page';
 $site_title = 'DanneggiastaCraft';
 
 
-class Pages extends Dbh {
+class Pages extends Dbh
+{
 
-    public function connectPage($pageid) {
+    public function connectPage($pageid)
+    {
 
         $dbc = parent::connect();
 
-        if(isset($_GET['page'])) {
+        $r = $dbc->prepare("SELECT * FROM pages WHERE id = $?");
+        $r->bind_param('s', $pageid);
+        $r->execute();
+        $r->bind_result($pageid);
+        $r->store_result();
 
-            $pageid = $_GET['page'];
+        $page = $r->fetch();
+
+        $count = $r->num_rows;
+
+        if ($count == 1) {
+
+            session_start();
+            if (isset($_GET['page'])) {
+
+                $pageid = $_GET['page'];
+
+            } else {
+
+                $pageid = 1;
+            }
 
         } else {
 
-            $pageid = 1;
+            header('Location: ../index.php');
+
+            session_write_close();
+
         }
-
-        $q = "SELECT * FROM pages WHERE id = $pageid";
-        $r = mysqli_query($dbc, $q);
-
-        $page = mysqli_fetch_assoc($r);
 
     }
 

@@ -49,7 +49,7 @@ session_write_close();
 
             <h1>DanneggiastaCraft</h1>
 
-            <p>World News</p>
+            <p><?php if(isset($page->output['header'])) { echo $page->output['header']; } ?></p>
 
         </div>
         <nav>

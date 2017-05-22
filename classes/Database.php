@@ -41,10 +41,10 @@ Class Database
         $this->db = null;
     }
 
-    public function query($sql){
-
-        return $this->db->query();
-    }
+//    public function query($sql){
+//
+//        return $this->db->query();
+//    }
 }
 
 ?>

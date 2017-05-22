@@ -2,14 +2,13 @@
 
 //require 'Database.php';
 
-class Table
+class Table extends Database
 {
     private $db = null;
 
-
     public function __construct()
     {
-        $this->db = Database::getInstance()->connect();
+        $this->db = parent::__construct();
     }
 
     public function createTable()

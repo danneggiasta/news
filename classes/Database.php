@@ -13,7 +13,7 @@ Class Database
 
     private static $instance = null;
 
-    private function __construct()
+    protected function __construct()
     {
         try {
             $this->db = new PDO($this->server, $this->user, $this->pass, $this->options);
@@ -26,20 +26,20 @@ Class Database
         }
     }
 
-    public static function getInstance()
-    {
-        if (is_null(self::$instance)) {
-
-            self::$instance = new Database();
-        }
-
-        return self::$instance;
-    }
-
-    public function connect()
-    {
-        return self::__construct();
-    }
+//    public static function getInstance()
+//    {
+//        if (is_null(self::$instance)) {
+//
+//            self::$instance = new Database();
+//        }
+//
+//        return self::$instance;
+//    }
+//
+//    public function connect()
+//    {
+//        return self::__construct();
+//    }
 
 }
 

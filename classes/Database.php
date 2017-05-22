@@ -36,15 +36,11 @@ Class Database
         return self::$instance;
     }
 
-    public function closeConnection()
+    public function connect()
     {
-        $this->db = null;
+        return self::__construct();
     }
 
-//    public function query($sql){
-//
-//        return $this->db->query();
-//    }
 }
 
 ?>

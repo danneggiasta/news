@@ -6,21 +6,22 @@ class Table
 {
     private $db = null;
 
+
     public function __construct()
     {
-        $this->db = Database::getInstance();
-
+        $this->db = Database::getInstance()->connect();
     }
 
     public function createTable()
     {
         try {
+
+
             // sql to create table
-            $sql = "CREATE TABLE `Student` ( `ID` INT NOT NULL AUTO_INCREMENT , `name`VARCHAR(40) NOT NULL , `last_name` VARCHAR(40) NOT NULL , `email` VARCHAR(40)NOT NULL , PRIMARY KEY (`ID`)) ";
+            $sql = "CREATE TABLE `StssaasssnAAAt` ( `ID` INT NOT NULL AUTO_INCREMENT , `name`VARCHAR(40) NOT NULL , `last_name` VARCHAR(40) NOT NULL , `email` VARCHAR(40)NOT NULL , PRIMARY KEY (`ID`)) ";
             // use exec() because no results are returned
             $this->db->exec($sql);
             echo "Table Student created successfully";
-            $this->db->closeConnection();
         } catch (PDOException $e) {
             echo "There is some problem in connection: " . $e->getMessage();
         }

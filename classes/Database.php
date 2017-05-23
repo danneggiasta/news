@@ -1,160 +1,155 @@
 <?php
-include 'config/database.php';
 
-Class Database
+require_once 'config/database.php';
+
+class Database
 {
+	private static $instance = null;
 
-    private $server = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . "";
-    private $user = DB_USER;
-    private $pass = DB_PASS;
+	private $pdo,
+		$errors = false,
+		$query,
+		$results,
+		$count = 0;
 
-    private $options = array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,);
+	private function __construct()
+	{
+		try {
+			$this->pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME, DB_USER, DB_PASS);
+		} catch (PDOException $e) {
+			die($e->getMessage());
+		}
+	}
 
-    private $db;
+	public static function getInstance()
+	{
+		if (is_null(self::$instance)) {
+			self::$instance = new Database();
+		}
 
+		return self::$instance;
+	}
 
-    public function __construct()
-    {
+	public function query($sql, $parameters = [])
+	{
+		$this->errors = false;
 
-        try {
-            $this->db = new PDO($this->server, $this->user, $this->pass, $this->options);
+		if ($this->query = $this->pdo->prepare($sql)) {
+			$x = 1;
+			foreach ($parameters as $parameter) {
+				$this->query->bindValue($x, $parameter);
+				$x++;
+			}
+		}
 
-            return $this->db;
+		if ($this->query->execute()) {
+			$this->results = $this->query->fetchAll(PDO::FETCH_OBJ);
+			$this->count = $this->query->rowCount();
+		} else {
+			echo $this->errors = "There was a problem executing this query";
+		}
 
-        } catch (PDOException $e) {
+		return $this;
+	}
 
-            return "There is some problem in connection: " . $e->getMessage();
-        }
-    }
+	public function action($action, $table, $parameters = [])
+	{
+		if (count($parameters)) {
+			if (count($parameters) === 3) {
+				$column = $parameters[0];
+				$operator = $parameters[1];
+				$value = $parameters[2];
 
-    public function __destruct()
-    {
-        return $this->db = null;
-    }
+				$operators = ['<', '>', '=', '<=', '>='];
 
-    function run($sql, $bind = array())
-    {
-        $sql = trim($sql);
+				if (in_array($operator, $operators)) {
+					$sql = "{$action} FROM {$table} WHERE {$column} {$operator} ?";
+				}
+				if (!$this->query($sql, [$value])->errors()) {
+					return $this;
+				}
+			}
+		}
 
-        try {
-            $result = $this->db->prepare($sql);
-            $result->execute($bind);
-            return $result;
-        } catch (PDOException $e) {
-            echo $e->getMessage();
-            exit(1);
-        }
-    }
+		return false;
+	}
 
-    function create($table, $data)
-    {
-        $fields = $this->filter($table, $data);
-        $sql = "INSERT INTO" . $table . " (" . implode($fields, ", ") . ") VALUES (:" . implode($fields, ", :") . ");";
-        $bind = array();
-        foreach ($fields as $field)
-            $bind[":$field"] = $data[$field];
-        $result = $this->run($sql, $bind);
-        return $this->db->lastInsertId();
-    }
+	public function insert($table, $parameters = [])
+	{
+		if (count($parameters)) {
+			$columns = implode(',', array_keys($parameters));
 
-    function read($fields = "*", $table, $where = "", $bind = array())
-    {
-        $sql = "SELECT " . $fields . " FROM " . $table;
-        if (!empty($where))
-            $sql .= " WHERE " . $where;
-        $sql .= ";";
-        $result = $this->run($sql, $bind);
-        $result->setFetchMode(PDO::FETCH_ASSOC);
-        $rows = array();
-        while ($row = $result->fetch()) {
-            $rows[] = $row;
-        }
-        return $rows;
-    }
+			$placeholders = "";
+			$x = 1;
 
-    function update($table, $data, $where, $bind = array())
-    {
-        $fields = $this->filter($table, $data);
-        $fieldSize = sizeof($fields);
-        $sql = "UPDATE " . $table . " SET ";
-        for ($f = 0; $f < $fieldSize; ++$f) {
-            if ($f > 0)
-                $sql .= ", ";
-            $sql .= $fields[$f] . " = :update_" . $fields[$f];
-        }
-        $sql .= " WHERE " . $where . ";";
-        foreach ($fields as $field)
-            $bind[":update_$field"] = $data[$field];
+			foreach ($parameters as $parameter) {
+				$placeholders .= "?";
+				if ($x < count($parameters)) {
+					$placeholders .= ", ";
+				}
+				$x++;
+			}
 
-        $result = $this->run($sql, $bind);
-        return $result->rowCount();
-    }
+			$sql = "INSERT INTO {$table} ({$columns}) VALUES ({$placeholders})";
 
-    function delete($table, $where, $bind = "")
-    {
-        $sql = "DELETE FROM" . $table . " WHERE " . $where . ";";
-        $result = $this->run($sql, $bind);
-        return $result->rowCount();
-    }
+			if (!$this->query($sql, $parameters)->errors()) {
+				return true;
+			}
+		}
 
-    private function filter($table, $data)
-    {
-        $driver = $this->config['dbdriver'];
-        if ($driver == 'sqlite') {
-            $sql = "PRAGMA table_info('" . $table . "');";
-            $key = "name";
-        } elseif ($driver == 'mysql') {
-            $sql = "DESCRIBE " . $table . ";";
-            $key = "Field";
-        } else {
-            $sql = "SELECT column_name FROM information_schema.columns WHERE table_name = '" . $table . "';";
-            $key = "column_name";
-        }
-        if (false !== ($list = $this->run($sql))) {
-            $fields = array();
-            foreach ($list as $record)
-                $fields[] = $record[$key];
-            return array_values(array_intersect($fields, array_keys($data)));
-        }
-        return array();
-    }
+		return false;
+	}
 
-    private $config = array(
-        # "dbdriver" => "sqlite",
-        # "sqlitedb" => "path/to/db.sqlite"
+	public function update($table, $id, $parameters = [])
+	{
+		if (count($parameters)) {
+			$set = "";
+			$x = 1;
+			foreach ($parameters as $column => $value) {
+				$set .= $column . "=?";
+				if ($x < count($parameters)) {
+					$set .= ", ";
+				}
+				$x++;
+			}
+			$sql = "UPDATE {$table} SET {$set} WHERE id = {$id}";
 
-        "dbdriver" => "mysql",
-        "dbuser" => "danneggiasta",
-        "dbpass" => "QAZxc321!@#",
-        "dbname" => "test"
-    );
+			if (!$this->query($sql, $parameters)->errors()) {
+				return true;
+			}
+		}
 
-    public function userLogin($email, $pass)
-    {
+		return false;
+	}
 
-        try {
-            $sql = "SELECT id FROM users WHERE 'email' = :email AND 'pass' = md5(:pass)";
+	public function get($table, $parameters = [])
+	{
+		return $this->action('SELECT *', $table, $parameters);
+	}
 
-            $bind = [':email' => $_POST['email'], ':pass' => $_POST['password']];
-            $result = $this->run($sql, $bind);
-            $count = $result->rowCount();
-            $data = $result->fetch(PDO::FETCH_ASSOC);
+	public function delete($table, $parameters = [])
+	{
+		return $this->action('DELETE', $table, $parameters);
+	}
 
-            if (isset($count)) {
-                $_SESSION['id'] = $data->id;
-                // Storing user session value
-                return true;
-            } else {
+	public function errors()
+	{
+		return $this->errors;
+	}
 
-                return false;
-            }
+	public function results()
+	{
+		return $this->results;
+	}
 
-        } catch(PDOException $e) {
+	public function first()
+	{
+		return $this->results()[0];
+	}
 
-            echo $e->getMessage();
-        }
-    }
+	public function count()
+	{
+		return $this->count;
+	}
 
 }
-
-?>

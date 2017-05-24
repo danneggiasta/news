@@ -1,7 +1,5 @@
 # news
 
-Hi minions!
+Example of building 'news' website....still in progress!
 
-How are YOU today?
-
-Wanna get some beer?
+OOP PHP, mySQL....

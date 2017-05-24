@@ -10,15 +10,6 @@ class User
 		$this->db = Database::getInstance();
 	}
 
-	public function register($values = array())
-	{
-		if ($this->db->insert('users', $values)) {
-			return true;
-		}
-
-		return false;
-	}
-
 	public function found($user)
 	{
 		$field = (is_numeric($user)) ? 'id' : 'username';
@@ -31,6 +22,16 @@ class User
 
 		return false;
 	}
+
+	public function register($values = array())
+	{
+		if ($this->db->insert('users', $values)) {
+			return true;
+		}
+
+		return false;
+	}
+
 
 	public function userData()
 	{

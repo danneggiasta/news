@@ -7,7 +7,7 @@
 
 		<?php
 		if (isset($_SESSION['id'])) {
-			echo "<h2 id='logout'>Welcome, Dear: ".$_SESSION['username']."</h2>
+			echo "<h2 id='logout'>Welcome, Dear: " . $_SESSION['username'] . "</h2>
 			<a href='logout.php'><input type='submit' name='logout' value='Log Out'></a>";
 
 		} else {
@@ -16,9 +16,12 @@
 			<h2>Login</h2>
 			<input type='text' name='username' placeholder='User Name' required>
 			<input type='password' name='password' placeholder='Password' required>
-			<input type='submit' name='loginSubmit' value='Log In'></form>
+			<input type='submit' name='loginSubmit' value='Log In'></form>";
+			if (isset($_SESSION['login'])) { ?><p><?php echo $_SESSION['login']; ?></p>
+			<?php }
 
-		<form action='signup.php' id='register' method='post'>
+
+			echo "<form action='signup.php' id='register' method='post'>
 
 			<h2>Register New Account </h2>
 			<input type='text' name='first' placeholder='First Name' required>
@@ -29,10 +32,12 @@
 				2,3})+$' required>
 			<input type='password' name='password' placeholder='Password' required>
 
-			<input type='submit' name='insert' value='Register'>
-
-		</form>
+			<input type='submit' name='insert' value='Register'>";
+			if (isset($_SESSION['register'])) { ?><h4><?php echo $_SESSION['register']; ?></h4>
+			<?php } elseif (isset($_SESSION['register_exist'])) { ?>
+				<p><?php echo $_SESSION['register_exist']; ?></p><?php echo "</form>
 		";
+			}
 		} ?>
 	</div>
 

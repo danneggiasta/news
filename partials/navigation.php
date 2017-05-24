@@ -1,3 +1,9 @@
+<?php
+
+
+
+?>
+
 <nav>
 	<ul>
 		<li class="current"><a href="index.php?page=1">Home</a></li>
